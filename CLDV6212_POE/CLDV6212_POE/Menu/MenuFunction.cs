@@ -33,7 +33,7 @@ namespace CLDV6212_POE.Menu
 
         [Function("CreateMenuItem")]
         public async Task<HttpResponseData> CreateMenuItem(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "menu")] HttpRequestData req)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "menu")] HttpRequestData req)
         {
             _logger.LogInformation("Processing request to create a menu item.");
 
@@ -57,7 +57,7 @@ namespace CLDV6212_POE.Menu
 
         [Function("GetAllMenuItems")]
         public async Task<HttpResponseData> GetAllMenuItems(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "menu")] HttpRequestData req)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "menu")] HttpRequestData req)
         {
             _logger.LogInformation("Retrieving all menu items.");
 
@@ -76,7 +76,7 @@ namespace CLDV6212_POE.Menu
 
         [Function("GetMenuItemsByCategory")]
         public async Task<HttpResponseData> GetMenuItemsByCategory(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "menu/category/{category}")] HttpRequestData req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "menu/category/{category}")] HttpRequestData req,
             string category)
         {
             _logger.LogInformation($"Retrieving menu items for category: {category}");
@@ -97,7 +97,7 @@ namespace CLDV6212_POE.Menu
 
         [Function("UpdateMenuItem")]
         public async Task<HttpResponseData> UpdateMenuItem(
-            [HttpTrigger(AuthorizationLevel.Function, "put", Route = "menu/{category}/{id}")] HttpRequestData req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "menu/{category}/{id}")] HttpRequestData req,
             string category, string id)
         {
             _logger.LogInformation($"Updating menu item with Category: {category} and ID: {id}");
@@ -133,7 +133,7 @@ namespace CLDV6212_POE.Menu
 
         [Function("DeleteMenuItem")]
         public async Task<HttpResponseData> DeleteMenuItem(
-            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = "menu/{category}/{id}")] HttpRequestData req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "menu/{category}/{id}")] HttpRequestData req,
             string category, string id)
         {
             _logger.LogInformation($"Deleting menu item with Category: {category} and ID: {id}");
