@@ -120,8 +120,8 @@ namespace CLDV6212_POE.Menu
             {
                 item.Price = updatedData.Price != 0 ? updatedData.Price : item.Price;
                 item.IsAvailable = updatedData.IsAvailable;
-                item.Description = updatedData.Description ?? item.Description;
-                item.Name = updatedData.Name ?? item.Name;
+                item.Description = string.IsNullOrEmpty(updatedData.Description) ? item.Description : updatedData.Description;
+                item.Name = string.IsNullOrEmpty(updatedData.Name) ? item.Name : updatedData.Name;
             }
 
             await tableClient.UpdateEntityAsync(item, item.ETag, TableUpdateMode.Replace);

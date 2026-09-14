@@ -1,0 +1,113 @@
+{
+  "info": {
+    "name": "CoffeeNChill - Part 1 (Azure Functions, Tables, Files, Docker)",
+    "description": "Covers all Part 1 HTTP endpoints: MenuItems (Azure Table Storage) and staff-docs (Azure File Share). Set baseUrl to http://localhost:7071 (func start) or http://localhost:7072 (standalone Docker container).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:7071" },
+    { "key": "category", "value": "Hot Drinks" },
+    { "key": "itemId", "value": "COF-001" }
+  ],
+  "item": [
+    {
+      "name": "Menu",
+      "item": [
+        {
+          "name": "Create Menu Item",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"PartitionKey\": \"{{category}}\",\n  \"RowKey\": \"{{itemId}}\",\n  \"Name\": \"Espresso\",\n  \"Description\": \"Strong black coffee shot\",\n  \"Price\": 25,\n  \"IsAvailable\": true\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/menu", "host": ["{{baseUrl}}"], "path": ["api", "menu"] }
+          }
+        },
+        {
+          "name": "Get All Menu Items",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/menu", "host": ["{{baseUrl}}"], "path": ["api", "menu"] }
+          }
+        },
+        {
+          "name": "Get Menu Items By Category",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/menu/category/{{category}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "menu", "category", "{{category}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Menu Item",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Price\": 30,\n  \"IsAvailable\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/menu/{{category}}/{{itemId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "menu", "{{category}}", "{{itemId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Menu Item",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/menu/{{category}}/{{itemId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "menu", "{{category}}", "{{itemId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Documents",
+      "item": [
+        {
+          "name": "Upload Staff Document",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/api/documents/upload", "host": ["{{baseUrl}}"], "path": ["api", "documents", "upload"] }
+          }
+        },
+        {
+          "name": "List Staff Documents",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/documents", "host": ["{{baseUrl}}"], "path": ["api", "documents"] }
+          }
+        },
+        {
+          "name": "Download Staff Document",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/documents/download/:fileName",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "documents", "download", ":fileName"],
+              "variable": [{ "key": "fileName", "value": "example.pdf" }]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
