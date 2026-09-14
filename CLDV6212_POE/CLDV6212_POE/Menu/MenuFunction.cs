@@ -115,7 +115,7 @@ namespace CLDV6212_POE.Menu
                 return notFoundResponse;
             }
 
-            var item = existingItem.Value;
+            var item = existingItem.Value!;
             if (updatedData != null)
             {
                 item.Price = updatedData.Price != 0 ? updatedData.Price : item.Price;
