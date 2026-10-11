@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\emeris\\source\\repos\\CoffeeNChill\\CoffeeNChill\\CoffeeNChill.csproj": {}
+    "C:\\Users\\emeris\\Documents\\GitHub\\clvdpart1\\CoffeeNChill\\CoffeeNChill.csproj": {}
   },
   "projects": {
-    "C:\\Users\\emeris\\source\\repos\\CoffeeNChill\\CoffeeNChill\\CoffeeNChill.csproj": {
+    "C:\\Users\\emeris\\Documents\\GitHub\\clvdpart1\\CoffeeNChill\\CoffeeNChill.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\emeris\\source\\repos\\CoffeeNChill\\CoffeeNChill\\CoffeeNChill.csproj",
+        "projectUniqueName": "C:\\Users\\emeris\\Documents\\GitHub\\clvdpart1\\CoffeeNChill\\CoffeeNChill.csproj",
         "projectName": "CoffeeNChill",
-        "projectPath": "C:\\Users\\emeris\\source\\repos\\CoffeeNChill\\CoffeeNChill\\CoffeeNChill.csproj",
+        "projectPath": "C:\\Users\\emeris\\Documents\\GitHub\\clvdpart1\\CoffeeNChill\\CoffeeNChill.csproj",
         "packagesPath": "C:\\Users\\emeris\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\emeris\\source\\repos\\CoffeeNChill\\CoffeeNChill\\obj\\",
+        "outputPath": "C:\\Users\\emeris\\Documents\\GitHub\\clvdpart1\\CoffeeNChill\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -45,7 +45,7 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.300"
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
         "net10.0": {
@@ -64,6 +64,10 @@
               "target": "Package",
               "version": "[12.27.1, )"
             },
+            "Azure.Storage.Queues": {
+              "target": "Package",
+              "version": "[12.28.1, )"
+            },
             "Microsoft.ApplicationInsights.WorkerService": {
               "target": "Package",
               "version": "[3.1.2, )"
@@ -79,6 +83,10 @@
             "Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore": {
               "target": "Package",
               "version": "[2.1.1, )"
+            },
+            "Microsoft.Azure.Functions.Worker.Extensions.Storage.Queues": {
+              "target": "Package",
+              "version": "[5.5.5, )"
             },
             "Microsoft.Azure.Functions.Worker.Sdk": {
               "target": "Package",
@@ -112,7 +120,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

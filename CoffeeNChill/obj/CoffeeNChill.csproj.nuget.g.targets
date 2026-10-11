@@ -5,5 +5,6 @@
     <Import Project="$(NuGetPackageRoot)microsoft.visualstudio.azure.containers.tools.targets\1.23.0\build\Microsoft.VisualStudio.Azure.Containers.Tools.Targets.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.visualstudio.azure.containers.tools.targets\1.23.0\build\Microsoft.VisualStudio.Azure.Containers.Tools.Targets.targets')" />
     <Import Project="$(NuGetPackageRoot)microsoft.azure.functions.worker.sdk\2.1.0\build\Microsoft.Azure.Functions.Worker.Sdk.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.azure.functions.worker.sdk\2.1.0\build\Microsoft.Azure.Functions.Worker.Sdk.targets')" />
     <Import Project="$(NuGetPackageRoot)azure.core\1.62.0\buildTransitive\net10.0\Azure.Core.targets" Condition="Exists('$(NuGetPackageRoot)azure.core\1.62.0\buildTransitive\net10.0\Azure.Core.targets')" />
+    <Import Project="$(NuGetPackageRoot)azure.storage.queues\12.28.1\buildTransitive\net10.0\Azure.Storage.Queues.targets" Condition="Exists('$(NuGetPackageRoot)azure.storage.queues\12.28.1\buildTransitive\net10.0\Azure.Storage.Queues.targets')" />
   </ImportGroup>
 </Project>
