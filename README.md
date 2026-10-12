@@ -1,4 +1,4 @@
-# CoffeeNChill - CLDV6212 POE Part 1
+# CoffeeNChill - CLDV6212 POE Parts 1 and 2
 
 Cloud foundation for the CoffeeNChill canteen system: Azure Table Storage for the menu, an Azure File Share for staff documents, and HTTP-triggered Azure Functions, all running locally via Azurite and containerized with Docker.
 
@@ -78,14 +78,6 @@ Published images:
 
 A Postman collection covering all 8 endpoints is in [`docs/CoffeeNChill.postman_collection.json`](docs/CoffeeNChill.postman_collection.json). Import it, set the `baseUrl` variable to your local (`http://localhost:7071`) or containerized (`http://localhost:7072`) instance, and run through it.
 
-## Team contributions (Part 1)
-
-| Member | Contribution |
-|---|---|
-| Lusanda | Initial Azure Functions project: Menu Table Storage CRUD and Documents File Share endpoints |
-| _(teammate)_ | _(fill in)_ |
-| _(you)_ | Fixed multipart upload data corruption and Azure Files 4MiB chunking bug; fixed Menu/Documents auth-level inconsistency; fixed `UpdateMenuItem` wiping Name/Description on partial updates; built and verified standalone Docker containers; pushed images to Docker Hub; built and verified the Postman collection; wrote this README |
-
 ## Demo video
 
 [INSERT UNLISTED YOUTUBE LINK]
@@ -133,3 +125,25 @@ The order table uses the order date as the partition key and the order ID as the
 Import [`docs/CoffeeNChill.part2.postman_collection.json`](docs/CoffeeNChill.part2.postman_collection.json) and use the local base URL `http://localhost:7071`.
 
 For the document upload test, Postman must be able to read `docs/sample-staff-recipe.txt`. Set Postman's working directory to the repository root if the Runner cannot find the file.
+
+## Part 2 submission
+
+### Published images
+
+- Functions: zgotem/coffeenchill-functions:v2.0
+- Azurite: zgotem/coffeenchill-azurite:v2.0
+
+### Project and startup
+
+The Functions project is in CLDV6212_POE/CLDV6212_POE. Run from the repository root:
+
+    docker compose -f docker-compose.yml up -d --pull always
+    docker compose -f docker-compose.yml ps
+
+The API runs at http://localhost:7071/api. The default Compose setup uses Azurite queues and tables, a bridge network, a health check and persistent storage. Staff documents use real Azure Files configured through the ignored local .env file. compose.azure.yml is an optional cloud storage override.
+
+### Testing evidence
+
+The captured Postman run passed 25 of 26 assertions. Order acceptance, completion, retrieval and validation tests passed. The Runner document upload returned 400; a separate manual upload returned 201. Document listing and download returned 200.
+
+Earlier testing screenshots are included in the demonstration. Later cloud operations failed and Azure reported ReadOnlyDisabledSubscription.
