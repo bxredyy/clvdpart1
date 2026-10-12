@@ -1,82 +1,92 @@
 # CoffeeNChill - CLDV6212 POE Parts 1 and 2
 
-Cloud foundation for the CoffeeNChill canteen system: Azure Table Storage for the menu, an Azure File Share for staff documents, and HTTP-triggered Azure Functions, all running locally via Azurite and containerized with Docker.
+CoffeeNChill is a canteen application built using Azure Functions and Azure Storage. The project supports menu management, staff documents and background order processing. Docker provides the container setup, and Postman is used to test the API.
 
-## What this covers
+## Project features
 
-- **Menu Table Storage** (`MenuItems` table): create, list, list-by-category, update, delete
-- **Staff Documents File Share** (`staff-docs`): upload, list, download
-- Both containerized as standalone Docker images (no Docker Compose in Part 1)
+### Menu management
 
-## Local setup
+Menu items are stored in the MenuItems table. The API supports creating items, listing the menu, filtering by category, updating items and deleting items.
 
-### Prerequisites
-- .NET SDK 10
-- [Azure Functions Core Tools v4](https://learn.microsoft.com/azure/azure-functions/functions-run-local) (`npm install -g azure-functions-core-tools@4 --unsafe-perm true`)
-- [Azurite](https://github.com/Azure/Azurite) (`npm install -g azurite`) or Docker
-- A real Azure Storage Account for the file share (Azurite does not emulate Azure Files — blob/queue/table only)
+### Staff documents
 
-### Configure `local.settings.json`
+Staff documents are stored in the staff-docs Azure File Share. The API supports uploading, listing and downloading documents. Azure Files requires a real Azure Storage account because Azurite does not emulate file shares.
 
-In `CLDV6212_POE/CLDV6212_POE/local.settings.json`:
+### Order processing
 
-```json
-{
-  "IsEncrypted": false,
-  "Values": {
-    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-    "StaffDocsFileShareStorage": "<connection string for a real Azure Storage Account>"
-  }
-}
-```
+The order endpoint accepts a customer name, selected item SKUs and total price. It validates the request and generates an order ID and timestamp. The order is serialized as JSON and sent as a Base64 encoded message to order-processing-queue.
 
-### Run locally
+A queue-triggered Function reads the message and stores the order in the Orders table. The order date is the partition key and the order ID is the row key. The worker updates the status through Received, Preparing, Ready and Collected.
 
-```bash
-# Terminal 1 - start Azurite (Table/Blob/Queue emulation)
-azurite --location .azurite
+The API also provides order listing, status lookup and poison queue inspection.
 
-# Terminal 2 - start the Functions host
-cd CLDV6212_POE/CLDV6212_POE
-func start
-```
+## Repository structure
 
-The API is then available at `http://localhost:7071/api/...`.
+- CLDV6212_POE/CLDV6212_POE: Functions project used for the containerized API.
+- CLDV6212_POE/CLDV6212_POE.slnx: solution file.
+- docker-compose.yml: local Functions and Azurite setup.
+- compose.azure.yml: optional override for cloud order storage.
+- .env.example: example environment variables.
+- docs: Postman collections, environment and sample upload file.
 
-## Running with Docker (standalone containers)
+## Requirements
 
-Per the Part 1 spec, no Docker Compose — each component runs as its own container.
+- Docker Desktop running with Linux containers.
+- An active Azure Storage account for staff documents.
+- Postman for API testing.
+- .NET SDK 10 and Azure Functions Core Tools v4 for running the Functions project outside Docker.
 
-**1. Run Azurite in its own container:**
-```bash
-docker run -d --name azurite -p 10000:10000 -p 10001:10001 -p 10002:10002 mcr.microsoft.com/azure-storage/azurite
-```
+## Docker setup
 
-**2. Build the Functions image:**
-```bash
-cd CLDV6212_POE
-docker build -f CLDV6212_POE/Dockerfile -t <dockerhub_username>/coffeenchill-functions:v1.0 .
-```
+Part 1 uses standalone containers. Part 2 uses Docker Compose to start the Functions application and Azurite together.
 
-**3. Run the Functions container**, pointed at the Azurite container for table storage and a real Azure Storage connection string for the file share:
-```bash
-docker network create coffeenchill-net
-docker network connect coffeenchill-net azurite
+Run the following from the repository root in Command Prompt:
 
-docker run -d --name coffeenchill-functions --network coffeenchill-net -p 7071:80 \
-  -e "AzureWebJobsStorage=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;" \
-  -e "StaffDocsFileShareStorage=<connection string for a real Azure Storage Account>" \
-  <dockerhub_username>/coffeenchill-functions:v1.0
-```
+    if not exist .env copy .env.example .env
 
-Published images:
-- `docker pull <dockerhub_username>/coffeenchill-functions:v1.0`
-- `docker pull <dockerhub_username>/coffeenchill-azurite:v1.0`
+Set STAFF_DOCS_CONNECTION_STRING in .env to the connection string for the staff document file share. Keep .env private; it is ignored by Git.
+
+Start the application:
+
+    docker compose -f docker-compose.yml up -d --pull always
+    docker compose -f docker-compose.yml ps
+
+The API is available at http://localhost:7071/api.
+
+The default Compose setup uses Azurite for local Blob, Queue and Table storage. Both containers share a bridge network. A health check waits for Azurite before starting Functions, and a named volume preserves storage data when containers are recreated.
+
+The optional compose.azure.yml override switches order storage to the real storage account configured through STAFF_DOCS_CONNECTION_STRING. It is not required for the default local Azurite workflow.
+
+## Published Part 2 images
+
+- zgotem/coffeenchill-functions:v2.0
+- zgotem/coffeenchill-azurite:v2.0
+
+Pull the images directly:
+
+    docker pull zgotem/coffeenchill-functions:v2.0
+    docker pull zgotem/coffeenchill-azurite:v2.0
+
+## Order endpoints
+
+- POST /api/orders/queue: validate and queue an order.
+- GET /api/orders: list saved orders.
+- GET /api/orders/status/{orderId}: retrieve an order status.
+- GET /api/orders/poison: inspect poison queue messages.
 
 ## Testing
 
-A Postman collection covering all 8 endpoints is in [`docs/CoffeeNChill.postman_collection.json`](docs/CoffeeNChill.postman_collection.json). Import it, set the `baseUrl` variable to your local (`http://localhost:7071`) or containerized (`http://localhost:7072`) instance, and run through it.
+Import docs/CoffeeNChill.part2.postman_collection.json into Postman and use http://localhost:7071 as baseUrl. The original collection is in docs/CoffeeNChill.postman_collection.json.
+
+The Part 2 collection covers menu operations, staff documents, order acceptance, lifecycle tracking, completed order retrieval, invalid input, unknown orders and poison queue inspection.
+
+For document uploads, select docs/sample-staff-recipe.txt in the file form-data field. Set the Postman working directory to the repository root if the Runner cannot access the file. Staff document requests require an active Azure Files connection.
+
+Check the response codes and assertions in Postman. Expected responses include 202 for an accepted order, 200 for retrieval, 400 for invalid input and 404 for an unknown order.
+
+## Group demonstration
+
+The group demonstration covers the application features, container setup and testing evidence. The unlisted video link is provided below.
 
 ## Demo video
 
@@ -85,65 +95,3 @@ A Postman collection covering all 8 endpoints is in [`docs/CoffeeNChill.postman_
 ## AI use disclosure
 
 Claude Code was used throughout this part to help debug issues (a multipart-parsing bug, an Azure Files upload size limit, an auth-level inconsistency surfaced by container testing, and an entity-update bug found while building the Postman tests) and to assist with Docker/WSL environment setup. All fixes were reviewed, tested, and verified against real Azure resources before being committed.
-
-## Part 2: queue-based order processing
-
-Part 2 adds an asynchronous order workflow. The order request is validated and placed on the `order-processing-queue`. The queue-triggered function saves the order in the `Orders` table and updates its status through `Received`, `Preparing`, `Ready`, and `Collected`.
-
-### Run with Docker Compose
-
-Run these commands from the repository root. The `.env` copy only happens if you do not already have a local `.env` file.
-
-```powershell
-if (-not (Test-Path .env)) {
-    Copy-Item .env.example .env
-}
-```
-
-Set `STAFF_DOCS_CONNECTION_STRING` in `.env` to the Azure Storage connection string for the `staff-docs` file share. Keep `.env` private; it is ignored by Git.
-
-Start the services:
-
-```powershell
-docker compose up -d --pull always
-docker compose ps
-```
-
-The Functions API is available at `http://localhost:7071/api`. Azurite provides local Queue and Table storage for the Compose setup. Staff documents use the configured Azure File Share.
-
-### Order endpoints
-
-- `POST /api/orders/queue` — validate and queue a new order
-- `GET /api/orders` — list saved orders
-- `GET /api/orders/status/{orderId}` — check an order's current status
-- `GET /api/orders/poison` — inspect messages in the poison queue
-
-The order table uses the order date as the partition key and the order ID as the row key.
-
-### Postman tests
-
-Import [`docs/CoffeeNChill.part2.postman_collection.json`](docs/CoffeeNChill.part2.postman_collection.json) and use the local base URL `http://localhost:7071`.
-
-For the document upload test, Postman must be able to read `docs/sample-staff-recipe.txt`. Set Postman's working directory to the repository root if the Runner cannot find the file.
-
-## Part 2 submission
-
-### Published images
-
-- Functions: zgotem/coffeenchill-functions:v2.0
-- Azurite: zgotem/coffeenchill-azurite:v2.0
-
-### Project and startup
-
-The Functions project is in CLDV6212_POE/CLDV6212_POE. Run from the repository root:
-
-    docker compose -f docker-compose.yml up -d --pull always
-    docker compose -f docker-compose.yml ps
-
-The API runs at http://localhost:7071/api. The default Compose setup uses Azurite queues and tables, a bridge network, a health check and persistent storage. Staff documents use real Azure Files configured through the ignored local .env file. compose.azure.yml is an optional cloud storage override.
-
-### Testing evidence
-
-The captured Postman run passed 25 of 26 assertions. Order acceptance, completion, retrieval and validation tests passed. The Runner document upload returned 400; a separate manual upload returned 201. Document listing and download returned 200.
-
-Earlier testing screenshots are included in the demonstration. Later cloud operations failed and Azure reported ReadOnlyDisabledSubscription.
