@@ -93,3 +93,43 @@ A Postman collection covering all 8 endpoints is in [`docs/CoffeeNChill.postman_
 ## AI use disclosure
 
 Claude Code was used throughout this part to help debug issues (a multipart-parsing bug, an Azure Files upload size limit, an auth-level inconsistency surfaced by container testing, and an entity-update bug found while building the Postman tests) and to assist with Docker/WSL environment setup. All fixes were reviewed, tested, and verified against real Azure resources before being committed.
+
+## Part 2: queue-based order processing
+
+Part 2 adds an asynchronous order workflow. The order request is validated and placed on the `order-processing-queue`. The queue-triggered function saves the order in the `Orders` table and updates its status through `Received`, `Preparing`, `Ready`, and `Collected`.
+
+### Run with Docker Compose
+
+Run these commands from the repository root. The `.env` copy only happens if you do not already have a local `.env` file.
+
+```powershell
+if (-not (Test-Path .env)) {
+    Copy-Item .env.example .env
+}
+```
+
+Set `STAFF_DOCS_CONNECTION_STRING` in `.env` to the Azure Storage connection string for the `staff-docs` file share. Keep `.env` private; it is ignored by Git.
+
+Start the services:
+
+```powershell
+docker compose up -d --pull always
+docker compose ps
+```
+
+The Functions API is available at `http://localhost:7071/api`. Azurite provides local Queue and Table storage for the Compose setup. Staff documents use the configured Azure File Share.
+
+### Order endpoints
+
+- `POST /api/orders/queue` — validate and queue a new order
+- `GET /api/orders` — list saved orders
+- `GET /api/orders/status/{orderId}` — check an order's current status
+- `GET /api/orders/poison` — inspect messages in the poison queue
+
+The order table uses the order date as the partition key and the order ID as the row key.
+
+### Postman tests
+
+Import [`docs/CoffeeNChill.part2.postman_collection.json`](docs/CoffeeNChill.part2.postman_collection.json) and use the local base URL `http://localhost:7071`.
+
+For the document upload test, Postman must be able to read `docs/sample-staff-recipe.txt`. Set Postman's working directory to the repository root if the Runner cannot find the file.

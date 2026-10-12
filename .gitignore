@@ -1,5 +1,14 @@
-.azurite/ 
+# Local storage data
+.azurite/
 
+# Visual Studio and build files
 .vs/
-bin/
-obj/
+**/bin/
+**/obj/
+*.csproj.user
+
+# Local settings and connection strings
+**/local.settings.json
+.env
+.env.*
+!.env.example

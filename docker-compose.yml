@@ -1,0 +1,80 @@
+name: coffeenchill-part2
+
+services:
+  # Run local Azure storage
+  azurite:
+    image: ${DOCKERHUB_USERNAME:-zgotem}/coffeenchill-azurite:v2.0
+    pull_policy: always
+    restart: unless-stopped
+    command:
+      - azurite
+      - --blobHost
+      - 0.0.0.0
+      - --queueHost
+      - 0.0.0.0
+      - --tableHost
+      - 0.0.0.0
+      - --location
+      - /data
+      - --skipApiVersionCheck
+      - --disableProductStyleUrl
+    ports:
+      - "127.0.0.1:10000:10000"
+      - "127.0.0.1:10001:10001"
+      - "127.0.0.1:10002:10002"
+    volumes:
+      - azurite-data:/data
+    networks:
+      - coffeenchill-network
+
+    # Wait until all storage services are listening
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - >-
+          const net = require('net');
+          let remaining = 3;
+          for (const port of [10000, 10001, 10002]) {
+            const socket = net.connect(port, '127.0.0.1');
+            socket.setTimeout(2000);
+            socket.on('connect', () => {
+              socket.destroy();
+              if (--remaining === 0) process.exit(0);
+            });
+            socket.on('error', () => process.exit(1));
+            socket.on('timeout', () => process.exit(1));
+          }
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  # Run our HTTP and queue-triggered functions
+  functions:
+    image: ${DOCKERHUB_USERNAME:-zgotem}/coffeenchill-functions:v2.0
+    pull_policy: always
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:7071:80"
+    environment:
+      FUNCTIONS_WORKER_RUNTIME: dotnet-isolated
+      AzureWebJobsStorage: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;"
+      StaffDocsFileShareStorage: ${STAFF_DOCS_CONNECTION_STRING:-}
+      AzureFunctionsJobHost__Logging__Console__IsEnabled: "true"
+      AzureFunctionsJobHost__logging__logLevel__Default: Information
+    depends_on:
+      azurite:
+        condition: service_healthy
+    networks:
+      - coffeenchill-network
+
+# Keep storage data when containers are recreated
+volumes:
+  azurite-data:
+
+# Allow the containers to communicate by service name
+networks:
+  coffeenchill-network:
+    driver: bridge
