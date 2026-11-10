@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="CLDV6212_POE/CLDV6212_POE.csproj" />
+  <Project Path="CoffeeNChill.Gateway/CoffeeNChill.Gateway.csproj" Id="4f16f03e-c380-4978-ab9d-eb3f82d88bb3" />
 </Solution>

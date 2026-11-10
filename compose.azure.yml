@@ -1,0 +1,4 @@
+﻿services:
+  functions:
+    environment:
+      AzureWebJobsStorage: ${STAFF_DOCS_CONNECTION_STRING:?Set STAFF_DOCS_CONNECTION_STRING in .env}

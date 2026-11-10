@@ -1,5 +1,52 @@
 [
   {
+    "name": "QueueOrder",
+    "scriptFile": "CoffeeNChill.dll",
+    "entryPoint": "CoffeeNChill.OrderFunctions.QueueOrder",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "req",
+        "direction": "In",
+        "type": "httpTrigger",
+        "authLevel": "Anonymous",
+        "methods": [
+          "post"
+        ],
+        "route": "orders/queue",
+        "properties": {}
+      },
+      {
+        "name": "$return",
+        "type": "http",
+        "direction": "Out"
+      }
+    ]
+  },
+  {
+    "name": "ProcessOrderQueue",
+    "scriptFile": "CoffeeNChill.dll",
+    "entryPoint": "CoffeeNChill.OrderFunctions.Run",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "myQueueItem",
+        "direction": "In",
+        "type": "queueTrigger",
+        "dataType": "String",
+        "queueName": "order-processing-queue",
+        "connection": "AzureWebJobsStorage",
+        "properties": {}
+      }
+    ]
+  },
+  {
     "name": "CreateMenuItem",
     "scriptFile": "CoffeeNChill.dll",
     "entryPoint": "CoffeeNChill.Models.MenuFunctions.CreateMenuItem",

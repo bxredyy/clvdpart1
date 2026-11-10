@@ -1,0 +1,748 @@
+{
+    "info":  {
+                 "name":  "CoffeeNChill - Part 2",
+                 "description":  "Covers all Part 1 HTTP endpoints: MenuItems (Azure Table Storage) and staff-docs (Azure File Share). Set baseUrl to http://localhost:7071 (func start) or http://localhost:7072 (standalone Docker container).",
+                 "schema":  "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+             },
+    "variable":  [
+                     {
+                         "key":  "baseUrl",
+                         "value":  "http://localhost:7071"
+                     },
+                     {
+                         "key":  "category",
+                         "value":  "Hot Drinks"
+                     },
+                     {
+                         "key":  "itemId",
+                         "value":  "COF-001"
+                     },
+                     {
+                         "key":  "orderId",
+                         "value":  ""
+                     },
+                     {
+                         "key":  "fileName",
+                         "value":  "sample-staff-recipe.txt"
+                     }
+                 ],
+    "item":  [
+                 {
+                     "name":  "Menu",
+                     "item":  [
+                                  {
+                                      "name":  "Create Menu Item",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"PartitionKey\": \"{{category}}\",\n  \"RowKey\": \"{{itemId}}\",\n  \"Name\": \"Espresso\",\n  \"Description\": \"Strong black coffee shot\",\n  \"Price\": 25,\n  \"IsAvailable\": true\n}"
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/menu",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "menu"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.collectionVariables.set(\u0027itemId\u0027, \u0027TEST-\u0027 + Date.now());"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "prerequest"
+                                                    },
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027menu item created\u0027, function () { pm.response.to.have.status(201); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Get All Menu Items",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/menu",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "menu"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027expected response status\u0027, function () { pm.response.to.have.status(200); });",
+                                                                                    "pm.test(\u0027response contains a list\u0027, function () { pm.expect(pm.response.json()).to.be.an(\u0027array\u0027); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Get Menu Items By Category",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/menu/category/{{category}}",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "menu",
+                                                                               "category",
+                                                                               "{{category}}"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027expected response status\u0027, function () { pm.response.to.have.status(200); });",
+                                                                                    "pm.test(\u0027response contains a list\u0027, function () { pm.expect(pm.response.json()).to.be.an(\u0027array\u0027); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Update Menu Item",
+                                      "request":  {
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"Price\": 30,\n  \"IsAvailable\": false\n}"
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/menu/{{category}}/{{itemId}}",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "menu",
+                                                                               "{{category}}",
+                                                                               "{{itemId}}"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027expected response status\u0027, function () { pm.response.to.have.status(200); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Delete Menu Item",
+                                      "request":  {
+                                                      "method":  "DELETE",
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/menu/{{category}}/{{itemId}}",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "menu",
+                                                                               "{{category}}",
+                                                                               "{{itemId}}"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027expected response status\u0027, function () { pm.response.to.have.status(200); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "Documents",
+                     "item":  [
+                                  {
+                                      "name":  "Upload Staff Document",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "body":  {
+                                                                   "mode":  "formdata",
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "file",
+                                                                                        "type":  "file",
+                                                                                        "src":  "docs/sample-staff-recipe.txt"
+                                                                                    }
+                                                                                ]
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/documents/upload",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "documents",
+                                                                               "upload"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027document uploaded\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(201);",
+                                                                                    "});",
+                                                                                    "if (pm.response.code === 201) {",
+                                                                                    "    const data = pm.response.json();",
+                                                                                    "    pm.collectionVariables.set(\u0027fileName\u0027, data.fileName || data.FileName);",
+                                                                                    "}"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "List Staff Documents",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/documents",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "documents"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027expected response status\u0027, function () { pm.response.to.have.status(200); });",
+                                                                                    "pm.test(\u0027response contains a list\u0027, function () { pm.expect(pm.response.json()).to.be.an(\u0027array\u0027); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Download Staff Document",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  "{{baseUrl}}/api/documents/download/{{fileName}}"
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027document downloaded\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "    pm.expect(pm.response.text()).to.include(\u0027CoffeeNChill staff recipe\u0027);",
+                                                                                    "});"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "Orders - Part 2",
+                     "item":  [
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "raw":  "{\"CustomerName\":\"Jane Smith\",\"SelectedItemSKUs\":[\"COF-001\",\"PAS-104\"],\"TotalPrice\":65}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  "{{baseUrl}}/api/orders/queue",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Queue order and track lifecycle",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027order accepted for background processing\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(202);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "if (pm.response.code === 202) {",
+                                                                                    "    const data = pm.response.json();",
+                                                                                    "    const orderId = data.orderId || data.OrderId;",
+                                                                                    "    const timestamp = data.orderTimestamp || data.OrderTimestamp;",
+                                                                                    "",
+                                                                                    "    pm.test(\u0027server generated an order ID and timestamp\u0027, function () {",
+                                                                                    "        pm.expect(orderId).to.match(/^ORD-/);",
+                                                                                    "        pm.expect(Number.isNaN(Date.parse(timestamp))).to.equal(false);",
+                                                                                    "    });",
+                                                                                    "",
+                                                                                    "    pm.collectionVariables.set(\u0027orderId\u0027, orderId);",
+                                                                                    "",
+                                                                                    "    const allowed = [\u0027Received\u0027, \u0027Preparing\u0027, \u0027Ready\u0027, \u0027Collected\u0027];",
+                                                                                    "    const observed = [];",
+                                                                                    "    const deadline = Date.now() + 45000;",
+                                                                                    "    const baseUrl = pm.variables.get(\u0027baseUrl\u0027);",
+                                                                                    "",
+                                                                                    "    function pollStatus() {",
+                                                                                    "        pm.sendRequest(",
+                                                                                    "            baseUrl + \u0027/api/orders/status/\u0027 + encodeURIComponent(orderId),",
+                                                                                    "            function (error, response) {",
+                                                                                    "                if (error) {",
+                                                                                    "                    pm.test(\u0027status endpoint reachable\u0027, function () {",
+                                                                                    "                        pm.expect(error).to.equal(null);",
+                                                                                    "                    });",
+                                                                                    "                    return;",
+                                                                                    "                }",
+                                                                                    "",
+                                                                                    "                if (![200, 404].includes(response.code)) {",
+                                                                                    "                    pm.test(\u0027status lookup succeeded\u0027, function () {",
+                                                                                    "                        pm.expect(response.code).to.equal(200);",
+                                                                                    "                    });",
+                                                                                    "                    return;",
+                                                                                    "                }",
+                                                                                    "",
+                                                                                    "                if (response.code === 200) {",
+                                                                                    "                    const order = response.json();",
+                                                                                    "                    const status = order.status || order.Status;",
+                                                                                    "",
+                                                                                    "                    if (!allowed.includes(status)) {",
+                                                                                    "                        pm.test(\u0027valid lifecycle status\u0027, function () {",
+                                                                                    "                            pm.expect(allowed).to.include(status);",
+                                                                                    "                        });",
+                                                                                    "                        return;",
+                                                                                    "                    }",
+                                                                                    "",
+                                                                                    "                    if (observed[observed.length - 1] !== status) {",
+                                                                                    "                        observed.push(status);",
+                                                                                    "                        console.log(\u0027order status:\u0027, status);",
+                                                                                    "                    }",
+                                                                                    "",
+                                                                                    "                    if (status === \u0027Collected\u0027) {",
+                                                                                    "                        pm.collectionVariables.set(",
+                                                                                    "                            \u0027observedStatuses\u0027,",
+                                                                                    "                            JSON.stringify(observed)",
+                                                                                    "                        );",
+                                                                                    "",
+                                                                                    "                        pm.test(\u0027order reached Collected\u0027, function () {",
+                                                                                    "                            pm.expect(status).to.equal(\u0027Collected\u0027);",
+                                                                                    "                        });",
+                                                                                    "",
+                                                                                    "                        pm.test(\u0027stored order matches the submitted order\u0027, function () {",
+                                                                                    "                            pm.expect(order.orderId || order.OrderId).to.equal(orderId);",
+                                                                                    "                            pm.expect(order.customerName || order.CustomerName).to.equal(\u0027Jane Smith\u0027);",
+                                                                                    "                            pm.expect(order.totalPrice || order.TotalPrice).to.equal(65);",
+                                                                                    "                            pm.expect(order.orderDate || order.OrderDate).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);",
+                                                                                    "                        });",
+                                                                                    "",
+                                                                                    "                        pm.test(\u0027observed statuses progress forwards\u0027, function () {",
+                                                                                    "                            const positions = observed.map(s =\u003e allowed.indexOf(s));",
+                                                                                    "                            pm.expect(positions).to.deep.equal(",
+                                                                                    "                                positions.slice().sort((a, b) =\u003e a - b)",
+                                                                                    "                            );",
+                                                                                    "                        });",
+                                                                                    "",
+                                                                                    "                        console.log(\u0027observed lifecycle:\u0027, observed.join(\u0027 -\u003e \u0027));",
+                                                                                    "                        return;",
+                                                                                    "                    }",
+                                                                                    "                }",
+                                                                                    "",
+                                                                                    "                if (Date.now() \u003e= deadline) {",
+                                                                                    "                    pm.test(\u0027order completes within 45 seconds\u0027, function () {",
+                                                                                    "                        pm.expect.fail(\u0027order did not reach Collected\u0027);",
+                                                                                    "                    });",
+                                                                                    "                    return;",
+                                                                                    "                }",
+                                                                                    "",
+                                                                                    "                setTimeout(pollStatus, 500);",
+                                                                                    "            }",
+                                                                                    "        );",
+                                                                                    "    }",
+                                                                                    "",
+                                                                                    "    pollStatus();",
+                                                                                    "}"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  "{{baseUrl}}/api/orders/status/{{orderId}}"
+                                                  },
+                                      "name":  "Get completed order status",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027completed order can be retrieved\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "    const order = pm.response.json();",
+                                                                                    "    pm.expect(order.status || order.Status).to.equal(\u0027Collected\u0027);",
+                                                                                    "    pm.expect(order.orderId || order.OrderId).to.equal(pm.variables.get(\u0027orderId\u0027));",
+                                                                                    "});"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  "{{baseUrl}}/api/orders"
+                                                  },
+                                      "name":  "Get all orders",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027orders table contains our order\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "    const orders = pm.response.json();",
+                                                                                    "    pm.expect(orders).to.be.an(\u0027array\u0027);",
+                                                                                    "    pm.expect(orders.some(o =\u003e",
+                                                                                    "        (o.orderId || o.OrderId) === pm.variables.get(\u0027orderId\u0027)",
+                                                                                    "    )).to.equal(true);",
+                                                                                    "});"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "raw":  "{\"SelectedItemSKUs\":[\"COF-001\"],\"TotalPrice\":25}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  "{{baseUrl}}/api/orders/queue",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Reject missing customer",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027invalid order rejected\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "    pm.expect(pm.response.json()).to.have.property(\u0027error\u0027);",
+                                                                                    "});"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "raw":  "{\"CustomerName\":\"Jane Smith\",\"SelectedItemSKUs\":[],\"TotalPrice\":25}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  "{{baseUrl}}/api/orders/queue",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Reject empty item list",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027invalid order rejected\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "    pm.expect(pm.response.json()).to.have.property(\u0027error\u0027);",
+                                                                                    "});"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "raw":  "{\"CustomerName\":\"Jane Smith\",\"SelectedItemSKUs\":[\"COF-001\"],\"TotalPrice\":0}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  "{{baseUrl}}/api/orders/queue",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Reject zero price",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027invalid order rejected\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "    pm.expect(pm.response.json()).to.have.property(\u0027error\u0027);",
+                                                                                    "});"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "raw":  "{\"CustomerName\":\"Jane Smith\",\"SelectedItemSKUs\":[\"COF-001\"],\"TotalPrice\":-5}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  "{{baseUrl}}/api/orders/queue",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Reject negative price",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027invalid order rejected\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "    pm.expect(pm.response.json()).to.have.property(\u0027error\u0027);",
+                                                                                    "});"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "raw":  "{\"CustomerName\":\"Jane Smith\",\"SelectedItemSKUs\":[\"\"],\"TotalPrice\":25}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  "{{baseUrl}}/api/orders/queue",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Reject blank SKU",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027invalid order rejected\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "    pm.expect(pm.response.json()).to.have.property(\u0027error\u0027);",
+                                                                                    "});"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "raw":  "{broken json",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  "{{baseUrl}}/api/orders/queue",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Reject malformed JSON",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027invalid order rejected\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "    pm.expect(pm.response.json()).to.have.property(\u0027error\u0027);",
+                                                                                    "});"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  "{{baseUrl}}/api/orders/status/ORD-NOT-FOUND"
+                                                  },
+                                      "name":  "Unknown order returns 404",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027unknown order returns 404\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(404);",
+                                                                                    "});"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  "{{baseUrl}}/api/orders/poison"
+                                                  },
+                                      "name":  "Inspect poison messages",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027poison queue inspection works\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "    const data = pm.response.json();",
+                                                                                    "    pm.expect(data.messages).to.be.an(\u0027array\u0027);",
+                                                                                    "    pm.expect(data.count).to.equal(data.messages.length);",
+                                                                                    "});"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  }
+                              ]
+                 }
+             ]
+}
