@@ -95,3 +95,19 @@ The group demonstration covers the application features, container setup and tes
 ## AI use disclosure
 
 Claude Code was used throughout this part to help debug issues (a multipart-parsing bug, an Azure Files upload size limit, an auth-level inconsistency surfaced by container testing, and an entity-update bug found while building the Postman tests) and to assist with Docker/WSL environment setup. All fixes were reviewed, tested, and verified against real Azure resources before being committed.
+
+## Part 3 Demonstration Video
+[Watch CoffeeNChill POE Part 3 Demonstration](https://youtu.be/02Aav6qqo64)
+
+## Part 3 Group Contributions
+- **bxredyy:** Parts 1 and 2 application development, repository maintenance and final demonstration documentation.
+- **Lusanda:** ASP.NET Core API Gateway, Azure Table Storage, BCrypt password hashing, JWT authentication and reported local testing.
+- **Omphi:** Part 3 development contribution; specific implementation to be confirmed against GitHub commits.
+
+## Part 3 Demonstration Video
+[Watch CoffeeNChill POE Part 3 Demonstration](https://youtu.be/02Aav6qqo64)
+
+## Part 3 Group Contributions
+- **bxredyy:** Parts 1 and 2 application development, repository maintenance and final demonstration documentation.
+- **Lusanda:** ASP.NET Core API Gateway, Azure Table Storage, BCrypt password hashing, JWT authentication and reported local testing.
+- **Omphi:** Part 3 development contribution; specific implementation to be confirmed against GitHub commits.
