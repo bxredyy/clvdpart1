@@ -111,3 +111,11 @@ Claude Code was used throughout this part to help debug issues (a multipart-pars
 - **bxredyy:** Parts 1 and 2 application development, repository maintenance and final demonstration documentation.
 - **Lusanda:** ASP.NET Core API Gateway, Azure Table Storage, BCrypt password hashing, JWT authentication and reported local testing.
 - **Omphi:** Part 3 development contribution; specific implementation to be confirmed against GitHub commits.
+
+## Part 3 Demonstration Video
+[Watch CoffeeNChill POE Part 3 Demonstration](https://youtu.be/02Aav6qqo64)
+
+## Part 3 Group Contributions
+- **bxredyy:** Parts 1 and 2 application development, repository maintenance and final demonstration documentation.
+- **Lusanda:** ASP.NET Core API Gateway, Azure Table Storage, BCrypt password hashing, JWT authentication and reported local testing.
+- **Omphi:** Part 3 development participation; implementation details pending verification.
